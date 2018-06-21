@@ -1,12 +1,13 @@
 language: python
 sudo: required
 
-addons:
-    apt:
-        packages:
-        - asciidoctor
+#addons:
+#    apt:
+#        packages:
+#        - asciidoctor
 
 before_install:
+		- gem install asciidoctor
     - curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
     - sudo apt-get install -y nodejs
     - npm install -g firebase
