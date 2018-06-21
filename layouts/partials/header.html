@@ -3,6 +3,7 @@
 <html lang="{{ .Site.LanguageCode | default "en" }}">
 
 <head>
+  {{ partial "seo_schema" . }}
   <title>{{ .Site.Title }}</title>
   {{ partial "meta" . }}
   {{ partial "header_includes" . -}}
