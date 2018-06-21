@@ -1,0 +1,12 @@
+---
+author: Kent Hua
+blogger_id: tag:blogger.com,1999:blog-3324719914062696225.post-4886840159371348562
+blogger_orig_url: http://blog.kenthua.com/2016/02/ose-31-mq-xpaas-queue-as-service.html
+comments: true
+date: "2016-02-17T11:28:00Z"
+modified_time: "2016-02-17T11:28:47.643-08:00"
+tags: null
+title: OSE 3.1 - A-MQ xPaaS, Queue as a Service exposing externally from OSE
+---
+
+So I wanted to try A-MQ xPaaS queue as a service within OpenShift 3.1.1.6. &nbsp;While everything is exposed correctly and functioning inside an OSE environment, what if I wanted to use the queue externally by another application. &nbsp;Only the services are created and no routes are created. &nbsp;The routes aren't created for good reason, the current router in OSE 3.1 only supports HTTP/HTTPS traffic. &nbsp;Though it uses HAProxy under the hood for the router, TCP is there, but just not implemented for OSE yet. <br /><br />There are future plans to support it, but for now, there is a nifty function in OSE (available in kube) called NodePort which allows you to expose your service, without a route. &nbsp;It's a manual effort, but it works. &nbsp;I have a sample&nbsp;<a href="https://github.com/kenthua/openshift/blob/master/configs/user/amq-tcp-nodeport-service.yml">yaml</a>&nbsp;file&nbsp;to create your service. &nbsp;Also checkout the <a href="https://github.com/kenthua/openshift/tree/master/configs/user">readme</a> for additional instructions.<br /><br />Once this service is created, all the registered nodes in OSE will expose the specified nodePort. &nbsp;So any of your nodes, even master (since it's a node as well) will expose the port. &nbsp;I didn't have to make any iptables changes, but be sure to check that out if you are experiencing any connectivity issues.<br /><br />Some additional information from the openshift <a href="https://docs.openshift.com/enterprise/3.1/dev_guide/integrating_external_services.html">docs</a>.

@@ -1,0 +1,101 @@
+---
+title: "Traffic into your kubernetes cluster"
+date: 2018-06-19T23:42:03Z
+draft: false
+tags: [traffic, kubernetes, gke, ingress, istio, path, ssl, secrets, mirroring]
+---
+
+There are many ways to handle ingress or traffic into your cluster.  GKE provides a cloud resources to help manage your traffic into your cluster.  Below are a few specified, but there are other methods as well.  What about SSL, passthrough / end to end.
+
+- Ingress (Google Cloud HTTP Load Balancer L7)
+- Service (Google Cloud Network TCP Load Balancer L3/4)
+- nginx (Google Cloud Network TCP Load Balancer L3/4)
+- istio (Google Cloud Network TCP Load Balancer L3/4)
+
+== GCP HTTP L7 - Global Load Balancer
+
+This is automatically created when you deploy an ingress resource in GKE or k8s on GCE with the GCP provider configured.  The global load balancer uses an anycast IP so you will be serviced by a Google edge endpoint closest to you and then travse the GCP network to get to your backend service.
+
+== GCP TCP L4 - Network Load Balancer
+
+This is automatically created when you specify a in a service `type: LoadBalancer` in GKE or k8s on GCE with the GCP provider configured.
+
+== nginx proxy - GCP TCP L4 - Network Load Balancer
+
+This is just creating an nginx proxy which is serviced by a the GCP L4 load balancer.  You will still define ingress objects inside GKE as you normally do and it will handle the routing for you. https://github.com/kenthua/gke/tree/master/gclb/nginx-ingress-example[Example]
+
+== istio - Ingress Gateway
+
+The istio ingress gateway is another mechanism which will help you do proxying/routing through the GCP L4 load balancer.  The traffic is managed by istio which means all the telemetry will also be tracked as well for your services.  Bonus! https://github.com/kenthua/gke/tree/master/gclb/multi-path[Example]
+
+== Ingress - Multiple Paths 
+
+What if I have 1 ingress, but multiple services I want to have as the backend.  This is do-able, but each service will need to have it's own uri context.  For example `/service1` and `service2`.  The ingress resource will not re-write the URLs for you, your services will have to listen to the URIs you specify.  
+
+https://github.com/kenthua/gke/tree/master/gclb/multi-path[Example]
+
+Istio can also help with this by helping you re-write URLs.  One example of this is the `httpbin` sample in istio, it expects to be at `/` root, but what if I wanted to have it listen to `/httpbin`
+
+First deploy the `httpbin` sample
+[source,bash]
+----
+kubectl apply -f <(istioctl kube-inject -f samples/httpbin/httpbin.yaml)
+----
+
+Then apply the following `Gateway` and `VirtualService`
+[source,bash]
+----
+cat <<EOF | istioctl kube-inject -f - | kubectl create -f -
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: service-gateway
+spec:
+  selector:
+    istio: ingressgateway # use istio default controller
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: httpbin
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - service-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /httpbin
+    rewrite:
+      uri: /
+    route:
+    - destination:
+        host: httpbin
+        port:
+          number: 8000
+EOF
+----
+
+You should now be able to hit your example with the following URL: `http://host:port/httpbin/`
+
+== What if I want to mirror traffic?
+
+Istio can help with this via one of it's supported contructs/patterns.  
+https://istio.io/docs/tasks/traffic-management/mirroring/[Mirroring]
+
+
+
+== SSL / Secrets?
+
+Not a problem, one can leverage secrets within k8s to store the certificates or the GCP constructs to store SSL certificates.
+
+- https://github.com/kenthua/gke/tree/master/gclb/nginx[Example 1]
+- https://github.com/kenthua/gke/tree/master/gclb/echo[Example 2]

@@ -1,0 +1,12 @@
+---
+author: Kent Hua
+blogger_id: tag:blogger.com,1999:blog-3324719914062696225.post-7374073576002631435
+blogger_orig_url: http://blog.kenthua.com/2015/08/openshift-enterprise-30-multi-host.html
+comments: true
+date: "2015-08-21T10:52:00Z"
+modified_time: "2015-08-21T10:52:48.726-07:00"
+tags: null
+title: OpenShift Enterprise 3.0 multi-host vagrant build
+---
+
+Earlier I posted information regarding an all-in-one build of OpenShift Enterprise via vagrant. &nbsp;<div><br /></div><div>I have since updated and created a new Vagrantfile with a multi-host build as well. &nbsp;This one requires a little more prep and setup because it's ideal to have your environment prepped and then stored as a box image. &nbsp;Otherwise each vm instance will need to go through all the yum install and updates which can add a significant amount of time. &nbsp;This prep work, once done, can get you a full multi-host build in about 10 minutes.</div><div><br /></div><div>So where is it? &nbsp;github here: <a href="https://github.com/kenthua/openshift/tree/master/vagrant/multihost">link</a></div><div><br /></div><div>Instructions are outlined in the <a href="https://github.com/kenthua/openshift/blob/master/vagrant/multihost/Readme.md">readme</a>. &nbsp;The instructions are also there on how to setup and prep your box image for the Vagrantfile to leverage. &nbsp;</div><div><br /></div><div>Why is there another box just for DNS? &nbsp;It just makes it easier to have it external so that you don't have to deal with extra firewall concerns. &nbsp;If you install it on one of the nodes, it works, but the openshift-ansible script makes modifications to your iptables so you have to be aware of what it changes.</div><div><br /></div><div>Why can't the dns server be on the master? &nbsp;Because port 53 is already taken by SkyDNS (for the local openshift network name resolution, svc.cluster.local, etc), sure you can assign it different ports, but it's just more things to be aware of when you need to make updates.</div>

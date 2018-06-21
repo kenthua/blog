@@ -1,0 +1,12 @@
+---
+author: Kent Hua
+blogger_id: tag:blogger.com,1999:blog-3324719914062696225.post-4009623064091916327
+blogger_orig_url: http://blog.kenthua.com/2016/02/jboss-brms-decision-server-62-kie-server.html
+comments: true
+date: "2016-02-17T11:42:00Z"
+modified_time: "2016-02-17T11:42:22.786-08:00"
+tags: null
+title: JBoss BRMS Decision Server 6.2 (kie-server)
+---
+
+So quite a bit has changed between Decision Server 6.1 and Decision Server 6.2. &nbsp;The way you interact with kie-server, such as registering a server and adding your containers. &nbsp;There are also changes to the kie-server URL and the payload generator as well.<br /><br />To register your kie-server, you now have to do it as a system-property. &nbsp;While it's outside of business-central, it does give you a little flexibility to manipulate the URLs. &nbsp;At the moment with 6.2, there some areas that need to be hard coded for now. &nbsp;Additional notes can be found in this KB <a href="https://access.redhat.com/solutions/2106041">article</a>.<br /><br />The container creation is a bit like before, you click + next to your registered server, then you specify the maven GAV of the project you want.<br /><br />On the client side, quite a few changes here as well, <a href="https://access.redhat.com/solutions/1486613">kie server client</a> is revamped along with the payload generator classes. &nbsp;There is a marshaller class one can use to generate XSTREAM, JSON, JAXB. &nbsp;The BatchExecutionCommand has some new ways of doing things. &nbsp;One of the bigger changes for standalone REST clients is that there is a new HTTP header property you need, "X-KIE-ContentType: XSTREAM" in order for the server to know the type of content you plan on sending. &nbsp;This KB <a href="https://access.redhat.com/solutions/2129781">article</a> mentions the types of acceptable content types.

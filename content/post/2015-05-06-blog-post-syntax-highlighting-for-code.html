@@ -1,0 +1,12 @@
+---
+author: Kent Hua
+blogger_id: tag:blogger.com,1999:blog-3324719914062696225.post-7404877367689820977
+blogger_orig_url: http://blog.kenthua.com/2015/05/blog-post-syntax-highlighting-for-code.html
+comments: true
+date: "2015-05-06T17:32:00Z"
+modified_time: "2015-05-06T17:47:59.156-07:00"
+tags: null
+title: Blog Post Syntax Highlighting For Code On Blogger
+---
+
+As I'm starting this out, I did some quick research for code syntax highlighting tools and found one that seems to be pretty active.<br /><div><br /></div><div>All I had to do was edit html of my blogger template design and add the following lines inside my head tag.</div><div><pre><code class="xml">&lt;link href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/styles/github.min.css' rel='stylesheet'/&gt;<br />&lt;script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js'/&gt;<br />&lt;script&gt;hljs.initHighlightingOnLoad();&lt;/script&gt;<br /></code></pre><br /></div><div>Then for each code block entry in any blog post, I need the following. <br /><pre><code class="xml">&lt;pre&gt;&lt;code class="xml"&gt;<br />...your code here...<br />&lt;/pre&gt;&lt;/code&gt;<br /></code></pre><br />You can find the appropriate css theme and language styles via the github sources. &nbsp;Once you find a theme you like, just replace the style with what you find on github. &nbsp;As noted in the instructions don't forget to include .min before .css. &nbsp;Although I think the pre-build hosted <a href="https://highlightjs.org/usage/">cdn</a> version doesn't have all the languages, only 22 I think as noted in the link.<br /><br />https://github.com/isagalaev/highlight.js/tree/master/src/languages<br />https://github.com/isagalaev/highlight.js/tree/master/src/styles<br /><br />Or you can compile it yourself with the <a href="http://highlightjs.readthedocs.org/en/latest/building-testing.html">build documentation</a>.<br /><br />You may also need to encode your content i.e. escape html tags. &nbsp;There are many online tools that can help with this. &nbsp;A bing search for html encoder will yield an encoder/decoder as part of your search result. &nbsp;Another tool is from:<br /><br />http://www.opinionatedgeek.com/dotnet/tools/htmlencode/encode.aspx<br /><br /><br /><br />Reference:<br />https://highlightjs.org/usage/<br />https://github.com/isagalaev/highlight.js/<br /><br /></div>

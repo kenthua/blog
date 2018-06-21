@@ -1,0 +1,34 @@
+baseurl: 'https://blog.kenthua.com/'
+title: Tech Ramblings
+copyright: >-
+  Content posted here do not reflect the views of any commerical or
+  organizational entity, they are of my opinion and mine only.
+canonifyURLs: true
+relativeURLs: true
+theme: kiera
+paginate: 10
+summaryLength: 30
+enableEmoji: true
+pygmentsCodeFences: true
+enableRobotsTXT: true
+enableGitInfo: true
+disqusShortname: techramblings
+googleAnalytics: UA-80183602-1
+author:
+  name: Kent Hua
+  github: kenthua
+  gitlab: kenthua
+  linkedin: kenthua
+  facebook: ''
+  twitter: kent_hua
+  instagram: ''
+params:
+  tagline: 'cloud, open source, home automation, technology'
+menu:
+  main:
+    - name: Home
+      url: /
+      weight: 0
+    - name: Blog
+      url: /post/
+      weight: 10

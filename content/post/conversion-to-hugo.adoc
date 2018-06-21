@@ -1,0 +1,55 @@
+---
+title: "Conversion to Hugo"
+date: 2018-06-19T23:20:07Z
+modified_time: "2018-06-20T15:52:44.608-07:00"
+draft: false
+tags: [hugo, open source, jekyll, migration]
+---
+
+
+So it begins my conversion from jekyll on github.io to hugo on github.io. It took a while to figure out `hugo import jekyll <jekyll_root> <hugo_root>`.  For starts it wanted my `hugo_root` to be a brand new folder, not something I generated with `hugo new site <site_name>`.
+
+Once I got it converted, nothing would show until I added a theme, which is very important, so the initial theme I chose is https://themes.gohugo.io/hugo-kiera/[kiera].  I followed the instructions to generate the site. 
+
+I also followed https://gohugo.io/hosting-and-deployment/hosting-on-github/[deploying on github] instructions.  It's a little different compared to jekyll because the repo for source files and generated static content is different.  That took a while with the submodules.
+
+== Notes
+
+One way to lists posts is via your configuration and using:
+
+[source,yaml]
+----
+menu:
+  main:
+    - name: Home
+      url: /
+      weight: 0
+    - name: Blog
+      url: /post/
+      weight: 10
+----
+
+I had some issues dealing with the themes and `public` submodule.  For theme, be sure to add it as a submodule.  In my initial case I'm using the `kiera` theme.  
+
+In your blog / site, hugo source folder:
+[source,bash]
+----
+git submodule add https://github.com/avianto/hugo-kiera.git themes/kiera
+----
+
+As for your public folder, I found it necessary to add the `public/` folder into the `.gitignore` file.  However, if you do this, you will have to force the submodule folder to be added.  I've found that if I don't do this, somehow git gets confused as to which commit the public folder is in.
+
+[source,bash]
+----
+echo "public/" >> .gitignore
+
+git submodule add -f -b master https://github.com/<your_account>/<your_account>.github.io
+----
+
+Don't forget to add `.gitignore` into source control.
+
+When you need to clone the repo, be sure to use `--recursive` to pull in the theme, otherwise your static site won't render properly.
+[source,bash]
+----
+git clone https://github.com/<your_username>/<your_hugo_source_repo> --recursive
+----

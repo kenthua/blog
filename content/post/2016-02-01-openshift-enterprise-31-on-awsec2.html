@@ -1,0 +1,12 @@
+---
+author: Kent Hua
+blogger_id: tag:blogger.com,1999:blog-3324719914062696225.post-7495179654197747338
+blogger_orig_url: http://blog.kenthua.com/2016/02/openshift-enterprise-31-on-awsec2.html
+comments: true
+date: "2016-02-01T16:18:00Z"
+modified_time: "2016-02-01T16:18:26.874-08:00"
+tags: null
+title: OpenShift Enterprise 3.1 on AWS/EC2
+---
+
+This particular deployment was my first experience/foray into the world of Amazon AWS EC2. &nbsp;While it took some getting used to the layout and terms, it eventually all ended up making sense for the most part. &nbsp;The prebuilt ansible playbooks did the heavy lifting and I just experimented and documented the runs.<br /><br />The project was initially created by the Red Hat OpenShift team to demonstrate OpenShift during the <a href="https://github.com/2015-Middleware-Keynote/demo-ansible">Middleware Keynote at Summit 2015</a>. &nbsp;It's was extended to support the <a href="http://training.runcloudrun.com/roadshow/">OpenShift Roadshow</a> that's been touring around. <br /><br />This particular set of instructions pertains to extending the instructions and tweaking the demo ansible for deploying the OpenShift Roadshow. &nbsp;My forked git repo is <a href="https://github.com/kenthua/roadshow-ansible">here</a>. &nbsp;I've extended the documentation/notes around AWS, run.py script, OpenShift notes and deploying with ansible running on OSX. <br /><br />Couple things to note to get started with AWS, once you setup your account, first setup and account through the Identity and Access Management (IAM) dashboard. &nbsp;This is where you will get your ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY. &nbsp;Particularly the AWS_SECRET_ACCESS_KEY is the one to protect the most, depending on the permissions given to the created account. &nbsp;For instance you need to provide EC2 and Route53 access in order for the roadshow-ansible/openshift-ansible playbooks to do their job. &nbsp;With enough access someone with access to your KEY and SECRET_KEY would be able to spin up instances at your cost. &nbsp;The permissions section gives you a simulate option to test fine grained permissions based on the task to be performed. <br /><br />On to EC2, each EC2 region requires a keypair for you to be able to access the provisioned systems. &nbsp;The keypair is associated to the region you want to deploy your instance workload to. &nbsp;AMI's may also be tied to a particular region as well.<br /><br /><br />

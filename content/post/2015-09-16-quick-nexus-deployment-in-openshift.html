@@ -1,0 +1,12 @@
+---
+author: Kent Hua
+blogger_id: tag:blogger.com,1999:blog-3324719914062696225.post-5253468641467081372
+blogger_orig_url: http://blog.kenthua.com/2015/09/quick-nexus-deployment-in-openshift.html
+comments: true
+date: "2015-09-16T17:08:00Z"
+modified_time: "2015-09-16T17:09:18.532-07:00"
+tags: null
+title: Nexus deployment in OpenShift Enterprise 3.0
+---
+
+For testing, prototyping, sometimes you just want to host a local nexus in your OpenShift environment. &nbsp;This also helps for some offline scenarios as well. &nbsp;Your environment and enterprise may need to address other requirements, but here is a quick way to deploy it.<br /><br />As an openshift user:<br /><pre><code class="bash"><br />oc new-project infra-tools<br />oc new-app sonatype/nexus:oss<br /></code></pre><br />This will give you external access to your nexus repository. (i.e. nexus.infra-tools.cloudapps.example.com) <br /><pre><code class="bash"><br />oc expose service nexus<br /></code></pre><br /><b>Nexus settings:</b><br />Add the&nbsp;<a href="https://access.redhat.com/maven-repository">Red Hat's hosted maven repository</a>[1] if you have JBoss Middleware in your enterprise. These will be of the type "Proxy Repository". &nbsp;Provide a repository name/id, such as jbossga and jbossea. &nbsp;The remote storage location will be the URLs referenced on the site. &nbsp;Once they've been added, under "Public Repositories" configuration, add your two new repo's to the ordered group repositories list.<br /><br /><b>OpenShift settings:</b><br />Likely the reason you have a nexus repo in openshift is you may be doing some S2I builds. &nbsp;Ideally your nexus will be referenced using the dns name, based on the commands above the openshift resolvable dns will be "nexus.infra-tools.svc.cluster.local". &nbsp;This entry should be used in your maven settings.xml when referencing your nexus repository.<br /><br />As of OpenShift Enterprise 3.0.1, the openshift dns is not resolvable in an S2I builder container[2][3]. Thus you will need to add your openshift master IP as the first nameserver (where the SkyDNS is running) to the master and each nodes /etc/resolv.conf.<br /><br />A sample github kitchensink[4] project is available to test with once your nexus is setup.<br /><br /><br /><br /><br />[1]&nbsp;https://access.redhat.com/maven-repository<br />[2]&nbsp;https://github.com/openshift/origin/issues/4303<br />[3]&nbsp;https://trello.com/c/f3azg2K1/685-builder-containers-don-t-have-openshift-cluster-dns<br />[4] https://github.com/kenthua/kitchensink-local

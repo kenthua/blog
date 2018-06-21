@@ -1,0 +1,12 @@
+---
+author: Kent Hua
+blogger_id: tag:blogger.com,1999:blog-3324719914062696225.post-7833044639461380966
+blogger_orig_url: http://blog.kenthua.com/2015/08/gradle-another-builddependency.html
+comments: true
+date: "2015-08-21T11:03:00Z"
+modified_time: "2015-08-21T11:03:21.847-07:00"
+tags: null
+title: gradle... another build/dependency management tool
+---
+
+Most of the time I'm working with maven, but there are those out there who use gradle. &nbsp;Granted this is my first shot at leveraging gradle, I was able to use it's built in mechanism for taking advantage of maven repos. &nbsp;So all I had to do was take an existing maven POM and tell gradle to generate a build/settings.gradle file.<br /><pre><code class="bash"><br />gradle init --type pom<br /></code></pre><br />Of course YMMV quite a bit depending on how complex and unique your pom is. &nbsp;However it's a start. &nbsp;I didn't really have to make many changes to the build.gradle after generation.<br /><br />The example that I used was the jboss-kitchensink webapp. &nbsp;I have it <a href="https://github.com/kenthua/kitchensink-gradle">here</a> as an example.<br /><br />Gradle looks to have inspiration coming from ant with concepts of tasks and being able to perform operations providing scripting like capabilities.<br /><br />Still new to me.
