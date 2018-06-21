@@ -1,0 +1,5 @@
+= Tech Ramblings Blog Source
+
+image:https://travis-ci.org/kenthua/blog.svg?branch=master["Build Status", link="https://travis-ci.org/kenthua/blog"]
+
+
