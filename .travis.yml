@@ -2,10 +2,14 @@ language: python
 
 install:
     - wget https://github.com/gohugoio/hugo/releases/download/v0.31.1/hugo_0.31.1_Linux-64bit.deb
+    - sudo apt-get install npm asciidoctor
     - sudo dpkg -i hugo*.deb
     - pip install Pygments
 
 script:
     - hugo
 
+deploy:
+    - firebase deploy --token $FIREBASE_TOKEN
+    
 #after_success: |
