@@ -15,7 +15,7 @@ One option in regards to HA of the underlying disk itself, currently in Beta, Re
 
 Persistent Volumes (PV) in kubernetes provide an abstraction of the actual storage being used.  Persistent Volume Claims (PVC) provide a claim to that PV which the pod will eventually mount when running.  PVs have a lifecycle and they need to be accounted for when trying to manage the data inside.
 
-By default in when the PVC is requested dynamically in GKE, the life reclaim policy is `Delete`, which may not be what you desire.  What this mean is when the PVC is unbound from the PV, the PV is deleted along with the disk.  So if you want the PV to stick around set the policy to `Retain`.  The underlying disk will remain.  You can create it all from scratch, such as:
+By default in when the PVC is requested dynamically in GKE, the life reclaim policy is `Delete`, which may not be what you desire.  What this mean is when the PVC is unbound from the PV, the PV is deleted along with the disk.  So if you want the PV to stick around set the policy to `Retain`.  The underlying disk will remain.  Since the disk remains, you could potentially migrate to a new cluster with your unattached disk.  You can create it all from scratch, such as:
 
 [source,bash]
 ----
