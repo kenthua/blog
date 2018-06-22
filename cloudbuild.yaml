@@ -4,7 +4,4 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/hugo'
   args: ['--debug', '-v']
 - name: 'gcr.io/$PROJECT_ID/firebase'
-  args: [
-    'deploy', 
-    '--token $_FIREBASE_TOKEN'
-  ]
+  args: ['deploy --token $_FIREBASE_TOKEN'] 
