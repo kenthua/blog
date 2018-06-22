@@ -1,0 +1,85 @@
+---
+title: "GKE Peristent Volume management"
+date: 2018-06-22T23:03:44Z
+draft: false
+tags: [gke, storage, pd, persistent disk, migration, pv, persistent volume, kubernetes]
+---
+
+== Introduction
+
+While the goals are to have our applications as stateless as possible, data will eventually need to get stored somewhere.  This storage can be in a database external of the cluster, storage buckets, or external systems, it may not make sense and you want to have it within the cluster.  If it is within the cluster, what happens to the data if I want to migrate to a new cluster or want to consider backups / HA / DR scenarios.  
+
+One option in regards to HA of the underlying disk itself, currently in Beta, Regional Persistent Disks are available which replicate the disk data between two zones in the same region.  See more details https://cloud.google.com/kubernetes-engine/docs/concepts/persistent-volumes#regional_persistent_disks[here].
+
+== On with the details
+
+Persistent Volumes (PV) in kubernetes provide an abstraction of the actual storage being used.  Persistent Volume Claims (PVC) provide a claim to that PV which the pod will eventually mount when running.  PVs have a lifecycle and they need to be accounted for when trying to manage the data inside.
+
+By default in when the PVC is requested dynamically in GKE, the life reclaim policy is `Delete`, which may not be what you desire.  What this mean is when the PVC is unbound from the PV, the PV is deleted along with the disk.  So if you want the PV to stick around set the policy to `Retain`.  The underlying disk will remain.  You can create it all from scratch, such as:
+
+[source,bash]
+----
+gcloud compute disks create pd-name --size 10GB --zone us-central1-a
+
+cat <<EOF | kubectl create -f -
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-demo
+spec:
+  storageClassName: ""
+  capacity:
+    storage: 10G
+  accessModes:
+    - ReadWriteOnce
+  gcePersistentDisk:
+    pdName: pd-name
+    fsType: ext4
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pv-claim-demo
+spec:
+  # It's necessary to specify "" as the storageClassName
+  # so that the default storage class won't be used, see
+  # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#class-1
+  storageClassName: ""
+  volumeName: pv-demo
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10G
+EOF      
+----
+
+https://cloud.google.com/kubernetes-engine/docs/concepts/persistent-volumes#using_preexsiting_persistent_disks_as_persistentvolumes[Additional GKE documentation around PVs]
+
+Once the disk is created, then you create a PV which points to the disk using the `pdName` attribute.  Once a PV is created, you create a PVC and use the `volumeName` attribute to point to a specific PV, otherwise it will give you a PV which matches the storageClass, label selector, access mode, and capacity.
+
+If the PV was already created dynamically, you can patch the PV to have the policy be `Retain`.  Otherwise if it was set to `Delete` it will delete the underlying disk as well if the PVC was deleted.
+
+[source,bash]
+----
+kubectl patch pv <your_pv> -p '{"spec":{"persistentVolumeReclaimPolicy":"Retain"}}'
+----
+
+For example, creating a PV dynamically:
+
+[source,yaml]
+----
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pv-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10G
+----
+
+Suppose that a PVC was manually deleted for a particular PV, it's set to `Retain` but you can't bind a new PVC to the PV, even though all the criteria matches.  The reason for this is because the data in the PV may have sensitive data inside.  An admin must manually intervene to unclaim the PV.  So even though a PV is in the `Released` state, you still can't bind to it.  So you must remove the `.spec.claimRef.uid` entry in the so that it can be bound again.  Some more details and reasoning can be found https://github.com/kubernetes/kubernetes/issues/48609#issuecomment-314066616[here].
+
