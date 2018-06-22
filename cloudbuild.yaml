@@ -4,7 +4,7 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/hugo'
 - name: 'gcr.io/$PROJECT_ID/firebase'
   entrypoint: 'sh'
-  args: ['-c', 'deploy --token $$FIREBASE_TOKEN']
+  args: ['-c', '/usr/local/bin/firebase deploy --token $$FIREBASE_TOKEN']
   secretEnv: ['FIREBASE_TOKEN']
 
 secrets:
