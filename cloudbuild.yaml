@@ -3,4 +3,11 @@ steps:
   args: ['submodule', 'update', '--init', '--recursive']
 - name: 'gcr.io/$PROJECT_ID/hugo'
 - name: 'gcr.io/$PROJECT_ID/firebase'
-  args: ['deploy', '--token', '$_FIREBASE_TOKEN']
+  args: ['deploy', '--token', '$$FIREBASE_TOKEN']
+  secretEnv: ['FIREBASE_TOKEN']
+
+# Encrypt Github token for push changes
+secrets:
+- kmsKeyName: projects/directed-advice-162422/locations/global/keyRings/blog/cryptoKeys/firebase-token
+  secretEnv:
+    FIREBASE_TOKEN: CiQA5dRPRqia1+8FYnabWM+siAkhyFWblhXqDi9LAEtqFHD6TN8SVgDwWP368lhiScDmaCtlcPwj+vNh6O1+lGIXN536QIh0DUhn48tLHgd0PokTpn9tx20OYkKsN3c1XEsEs0Fq1pMw1XwFGJ8l+UHPqdA/EdhQLd/hB4/q
