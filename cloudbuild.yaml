@@ -1,0 +1,9 @@
+steps:
+- name: 'gcr.io/$PROJECT_ID/hugo'
+  args: ['hugo']
+- name: 'gcr.io/$PROJECT_ID/firebase'
+  args: [
+    'firebase', 
+    'deploy', 
+    '--token $_FIREBASE_TOKEN'
+  ]
