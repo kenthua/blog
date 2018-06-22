@@ -1,6 +1,8 @@
 steps:
+- name: 'gcr.io/cloud-builders/git'
+  args: ['submodule', 'update', '--init', '--recursive']
 - name: 'gcr.io/$PROJECT_ID/hugo'
-  args: ['--debug']
+  args: ['--debug', '-v']
 - name: 'gcr.io/$PROJECT_ID/firebase'
   args: [
     'deploy', 
