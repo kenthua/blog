@@ -1,6 +1,5 @@
 steps:
 - name: 'gcr.io/$PROJECT_ID/hugo'
-  args: ['hugo']
 - name: 'gcr.io/$PROJECT_ID/firebase'
   args: [
     'deploy', 
