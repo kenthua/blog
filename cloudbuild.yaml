@@ -3,7 +3,7 @@ steps:
   args: ['submodule', 'update', '--init', '--recursive']
 - name: 'gcr.io/$PROJECT_ID/hugo'
 - name: 'gcr.io/$PROJECT_ID/firebase'
-  args: ['deploy', '--token', '$$FIREBASE_TOKEN']
+  args: ['deploy', '--token', '$FIREBASE_TOKEN']
 
 # Encrypt Github token for push changes
 secrets:
