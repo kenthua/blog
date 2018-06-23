@@ -7,7 +7,7 @@ tags: [gke, storage, pd, persistent disk, migration, pv, persistent volume, kube
 
 == Introduction
 
-While the goals are to have our applications as stateless as possible, data will eventually need to get stored somewhere.  This storage can be in a database external of the cluster, storage buckets, or external systems, it may not make sense and you want to have it within the cluster.  If it is within the cluster, what happens to the data if I want to migrate to a new cluster or want to consider backups / HA / DR scenarios.  
+Application data will at some point be stored somewhere.  This storage can be in a database external of the cluster, storage buckets, or external systems.  If it is within the cluster, what happens to the data if I want to migrate to a new cluster or want to consider backups / HA / DR scenarios.  
 
 One option in regards to HA of the underlying disk itself, currently in Beta, Regional Persistent Disks are available which replicate the disk data between two zones in the same region.  See more details https://cloud.google.com/kubernetes-engine/docs/concepts/persistent-volumes#regional_persistent_disks[here].
 
