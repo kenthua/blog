@@ -1,26 +1,19 @@
 baseurl: 'https://blog.kenthua.com/'
-title: 'Tech Ramblings'
+title: Tech Ramblings
 copyright: >-
   Content posted here do not reflect the views of any commerical or
   organizational entity, they are of my opinion and mine only.
-
 canonifyURLs: true
 relativeURLs: true
-uglyURLs: false
-theme: hugo-bootstrap-premium
+theme: kiera
 paginate: 10
 summaryLength: 30
 enableEmoji: true
-#pygmentsCodeFences: true
+pygmentsCodeFences: true
 enableRobotsTXT: true
 enableGitInfo: true
 disqusShortname: techramblings
 googleAnalytics: UA-80183602-1
-
-permalinks:
-  post: '/:year/:month/:day/:filename/'
-  code: '/:filename/'
-
 author:
   name: Kent Hua
   github: kenthua
@@ -31,11 +24,6 @@ author:
   instagram: ''
 params:
   tagline: 'cloud, open source, home automation, technology'
-  bootswatchtheme: 'paper' #hbp
-  showRightSidebar: 'true' #hbp
-  googleAnalytics: 'UA-80183602-1' #hbp
-  showBlogHeader: true #hbp
-  switchlang: false #hbp
 menu:
   main:
     - name: Home
