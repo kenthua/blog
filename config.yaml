@@ -14,6 +14,11 @@ enableRobotsTXT: true
 enableGitInfo: true
 disqusShortname: techramblings
 googleAnalytics: UA-80183602-1
+
+permalinks:
+  post: '/:year/:month/:day/:filename/'
+  code: '/:filename/'
+
 author:
   name: Kent Hua
   github: kenthua
