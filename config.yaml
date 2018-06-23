@@ -3,9 +3,11 @@ title: Tech Ramblings
 copyright: >-
   Content posted here do not reflect the views of any commerical or
   organizational entity, they are of my opinion and mine only.
+
 canonifyURLs: true
 relativeURLs: true
-theme: kiera
+uglyURLs: false
+theme: hugo-bootstrap-premium
 paginate: 10
 summaryLength: 30
 enableEmoji: true
@@ -14,6 +16,7 @@ enableRobotsTXT: true
 enableGitInfo: true
 disqusShortname: techramblings
 googleAnalytics: UA-80183602-1
+
 author:
   name: Kent Hua
   github: kenthua
@@ -24,6 +27,9 @@ author:
   instagram: ''
 params:
   tagline: 'cloud, open source, home automation, technology'
+  bootswatchtheme: 'paper' #hbp
+  showRightSidebar: 'true' #hbp
+  googleAnalytics: 'UA-80183602-1' #hbp
 menu:
   main:
     - name: Home
