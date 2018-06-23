@@ -1,6 +1,6 @@
 baseurl: 'https://blog.kenthua.com/'
-title: Tech Ramblings
-copyright: >-
+title: 'Tech Ramblings'
+footline: >-
   Content posted here do not reflect the views of any commerical or
   organizational entity, they are of my opinion and mine only.
 
@@ -30,7 +30,7 @@ params:
   bootswatchtheme: 'paper' #hbp
   showRightSidebar: 'true' #hbp
   googleAnalytics: 'UA-80183602-1' #hbp
-  showBlogHeader: true
+  #  showBlogHeader: true
 menu:
   main:
     - name: Home
