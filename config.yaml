@@ -17,6 +17,10 @@ enableGitInfo: true
 disqusShortname: techramblings
 googleAnalytics: UA-80183602-1
 
+permalinks:
+  post: '/:year/:month/:day/:filename/'
+  code: '/:filename/'
+
 author:
   name: Kent Hua
   github: kenthua
@@ -26,11 +30,12 @@ author:
   twitter: kent_hua
   instagram: ''
 params:
-  tagline: 'cloud, open source, home automation, technology'
+  topline: 'cloud, open source, home automation, technology' #hbp -- original #tagline
   bootswatchtheme: 'paper' #hbp
   showRightSidebar: 'true' #hbp
   googleAnalytics: 'UA-80183602-1' #hbp
-  #  showBlogHeader: true
+  showBlogHeader: true #hbp
+  switchlang: false #hbp
 menu:
   main:
     - name: Home
