@@ -11,7 +11,7 @@ theme: hugo-bootstrap-premium
 paginate: 10
 summaryLength: 30
 enableEmoji: true
-pygmentsCodeFences: true
+#pygmentsCodeFences: true
 enableRobotsTXT: true
 enableGitInfo: true
 disqusShortname: techramblings
@@ -30,6 +30,7 @@ params:
   bootswatchtheme: 'paper' #hbp
   showRightSidebar: 'true' #hbp
   googleAnalytics: 'UA-80183602-1' #hbp
+  showBlogHeader: true
 menu:
   main:
     - name: Home
