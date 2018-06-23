@@ -1,6 +1,6 @@
 baseurl: 'https://blog.kenthua.com/'
 title: 'Tech Ramblings'
-footline: >-
+copyrighte: >-
   Content posted here do not reflect the views of any commerical or
   organizational entity, they are of my opinion and mine only.
 
@@ -30,7 +30,7 @@ author:
   twitter: kent_hua
   instagram: ''
 params:
-  topline: 'cloud, open source, home automation, technology' #hbp -- original #tagline
+  tagline: 'cloud, open source, home automation, technology'
   bootswatchtheme: 'paper' #hbp
   showRightSidebar: 'true' #hbp
   googleAnalytics: 'UA-80183602-1' #hbp
