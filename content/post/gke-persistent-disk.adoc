@@ -4,6 +4,7 @@ date: 2018-06-22T23:03:44Z
 draft: false
 tags: [gke, storage, pd, persistent disk, migration, pv, persistent volume, kubernetes]
 ---
+:source-highlighter: pygments
 
 == Introduction
 
