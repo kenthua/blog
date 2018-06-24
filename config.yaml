@@ -5,12 +5,13 @@ copyright: >-
   organizational entity, they are of my opinion and mine only.
 canonifyURLs: true
 relativeURLs: true
-theme: kiera
+theme: beautifulhugo
 paginate: 10
 summaryLength: 30
 enableEmoji: true
-#pygmentsCodeFences: true
-#pygmentsUseClasses: true
+pygmentsCodeFences: true
+pygmentsUseClasses: true
+pygmentsCodefencesGuessSyntax: true
 enableRobotsTXT: true
 enableGitInfo: true
 disqusShortname: techramblings
@@ -29,7 +30,12 @@ author:
   twitter: kent_hua
   instagram: ''
 params:
-  tagline: 'cloud, open source, home automation, technology'
+  subtitle: 'cloud, open source, home automation, technology'
+  rss: true
+  comments: true
+  dateFormat: '2006-01-02'
+  readingTime: true
+  socialShare: true
   description: 'Discussion about technology and things that interest me'
   keywords: 'cloud,open source,home automation,technology,gcp,gke,kubernetes,java,google,tech'
 menu:
