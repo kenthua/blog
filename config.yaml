@@ -36,6 +36,7 @@ params:
   dateFormat: '2006-01-02'
   readingTime: true
   socialShare: true
+  useHLJS: true
   description: 'Discussion about technology and things that interest me'
   keywords: 'cloud,open source,home automation,technology,gcp,gke,kubernetes,java,google,tech'
 menu:
