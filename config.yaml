@@ -1,8 +1,5 @@
 baseurl: 'https://blog.kenthua.com/'
 title: tech ramblings
-copyright: >-
-  Content posted here do not reflect the views of any commerical or
-  organizational entity, they are of my opinion and mine only.
 canonifyURLs: true
 relativeURLs: true
 theme: beautifulhugo
@@ -26,9 +23,7 @@ author:
   github: kenthua
   gitlab: kenthua
   linkedin: kenthua
-  facebook: ''
   twitter: kent_hua
-  instagram: ''
 params:
   subtitle: 'cloud, open source, home automation, technology'
   rss: true
