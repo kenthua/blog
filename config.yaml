@@ -10,7 +10,7 @@ pygmentsCodeFences: true
 pygmentsUseClasses: true
 pygmentsCodefencesGuessSyntax: true
 enableRobotsTXT: true
-enableGitInfo: true
+#enableGitInfo: true
 disqusShortname: techramblings
 googleAnalytics: UA-80183602-1
 
