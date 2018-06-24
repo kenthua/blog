@@ -9,7 +9,7 @@ theme: kiera
 paginate: 10
 summaryLength: 30
 enableEmoji: true
-#pygmentsCodeFences: true
+pygmentsCodeFences: true
 enableRobotsTXT: true
 enableGitInfo: true
 disqusShortname: techramblings
@@ -29,6 +29,7 @@ author:
   instagram: ''
 params:
   tagline: 'cloud, open source, home automation, technology'
+  keywords: 'cloud, open source, home automation, technology, gcp, gke, kubernetes, java, google, tech'
 menu:
   main:
     - name: Home
