@@ -2,8 +2,17 @@
 If you want to include any custom html just before </body>, put it in /layouts/partials/footer_custom.html
 Do not put anything in this file - it's only here so that hugo won't throw an error if /layouts/partials/footer_custom.html doesn't exist.
 -->
-<div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <ul class="list-inline text-center footer-links">
 <p class="credits copyright text-muted">
 Content posted here do not reflect the views of any commerical or organizational entity, they are of my opinion and mine only.
 </p>
-</div>
+	</ul>
+      </div>
+    </div>
+  </div>
+</footer>
+
