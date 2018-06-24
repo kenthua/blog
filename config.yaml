@@ -29,7 +29,8 @@ author:
   instagram: ''
 params:
   tagline: 'cloud, open source, home automation, technology'
-  keywords: 'cloud, open source, home automation, technology, gcp, gke, kubernetes, java, google, tech'
+  description: 'Discussion about technology and things that interest me'
+  keywords: 'cloud,open source,home automation,technology,gcp,gke,kubernetes,java,google,tech'
 menu:
   main:
     - name: Home
