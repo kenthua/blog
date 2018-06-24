@@ -25,6 +25,7 @@ author:
   linkedin: kenthua
   twitter: kent_hua
 params:
+  homeTitle: thoughts
   subtitle: 'cloud, open source, home automation, technology'
   rss: true
   comments: true
