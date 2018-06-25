@@ -13,6 +13,8 @@ enableRobotsTXT: true
 #enableGitInfo: true
 disqusShortname: techramblings
 googleAnalytics: UA-80183602-1
+gcse: '018150144781013646340:qabfu9bsm5k'
+
 
 permalinks:
   post: '/:year/:month/:day/:filename/'
