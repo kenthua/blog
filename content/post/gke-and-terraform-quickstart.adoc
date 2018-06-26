@@ -7,7 +7,7 @@ tags: [gke, kubernetes, gcp, terraform, node pool, cluser, provider]
 
 As I am just starting to use Terraform for GKE, I noticed the google provider plugin support for Terraform is https://github.com/terraform-providers/terraform-provider-google/issues/285[constantly improving] for the GKE component.  There are many ways to get started, but there are also some guides to getting started with the examples.  
 
-The first thing to notice there are 2 https://github.com/terraform-providers/terraform-provider-google/issues/475[resources] which are available as it relates to GKE, https://www.terraform.io/docs/providers/google/r/container_cluster.html[google_container_cluster] and https://www.terraform.io/docs/providers/google/r/container_node_pool.html[google_container_node_pool].  This setup allows for us separate the management of the cluster and it's node pools which can be managed by different teams.
+The first thing to notice is, there are 2 https://github.com/terraform-providers/terraform-provider-google/issues/475[resources] which are available as it relates to GKE, https://www.terraform.io/docs/providers/google/r/container_cluster.html[google_container_cluster] and https://www.terraform.io/docs/providers/google/r/container_node_pool.html[google_container_node_pool].  This setup allows for us separate the management of the cluster and it's node pools which can be managed by different teams.
 
 While this is my first foray, there are likely some practices I have not yet started to use because I'm unaware of it.  But here goes as a first shot.
 
@@ -16,7 +16,7 @@ In the example linked, one good practice is to not have the `default-pool` creat
 == The Files
 So if we get started we have a few files to get started with when setting up terraform.  You can pretty much call the files whatever you like, you can also put most into a single file.
 
-https://github.com/kenthua/gke/blob/master/terraform/connections.tf[.connections.tf] - provider information
+https://github.com/kenthua/gke/blob/master/terraform/connections.tf[connections.tf] - provider information
 [source,bash]
 ----
 provider "google" {
@@ -27,7 +27,7 @@ provider "google" {
 }
 ----
 
-https://github.com/kenthua/gke/blob/master/terraform/variables.tf[.variables.tf] - variable definition
+https://github.com/kenthua/gke/blob/master/terraform/variables.tf[variables.tf] - variable definition
 [source,bash]
 ----
 variable "region" {
@@ -43,7 +43,7 @@ variable "project" {
 }
 ----
 
-https://github.com/kenthua/gke/blob/master/terraform/terraform.tfvars[.terraform.tfvars] - your variable definitions
+https://github.com/kenthua/gke/blob/master/terraform/terraform.tfvars[terraform.tfvars] - your variable definitions
 [source,bash]
 ----
 project = "<your_project_name>"
@@ -51,7 +51,7 @@ cluster_name = "tf-cluster"
 region = "us-west1"
 ----
 
-https://github.com/kenthua/gke/blob/master/terraform/main.tf[.main.tf] - the main file
+https://github.com/kenthua/gke/blob/master/terraform/main.tf[main.tf] - the main file
 [source,bash]
 ----
 data "google_compute_zones" "available" {} # get some zone information
@@ -85,7 +85,7 @@ resource "google_container_node_pool" "nodepool0" {
 }
 ----
 
-https://github.com/kenthua/gke/blob/master/terraform/output.tf[.output.tf] - the output, which can be used to query for data post apply
+https://github.com/kenthua/gke/blob/master/terraform/output.tf[output.tf] - the output, which can be used to query for data post apply
 [source,bash]
 ----
 
@@ -119,7 +119,7 @@ Applies the changes to reach the desired state.  You can apply your `plan` file 
 terraform apply
 ----
 
-==== Note
+=== Notes
 
 The following below can be used with `plan` or `apply`.
 
