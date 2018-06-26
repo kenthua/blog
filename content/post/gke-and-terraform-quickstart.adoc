@@ -1,8 +1,8 @@
 ---
-title: "GKE and Terraform Quickstart"
+title: "Google Kubernetes Engine (GKE) and Terraform Quickstart"
 date: 2018-06-25T23:04:21Z
 draft: false
-tags: [gke, kubernetes, gcp, terraform, node pool, cluser, provider]
+tags: [gke, kubernetes, gcp, terraform, node pool, cluster, provider, google, google kubernetes engine]
 ---
 
 As I am just starting to use Terraform for GKE, I noticed the google provider plugin support for Terraform is https://github.com/terraform-providers/terraform-provider-google/issues/285[constantly improving] for the GKE component.  There are many ways to get started, but there are also some guides to getting started with the examples.  

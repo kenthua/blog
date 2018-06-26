@@ -1,8 +1,8 @@
 ---
-title: "GKE Peristent Volume management"
+title: "Google Kubernetes Engine (GKE) Peristent Volume management"
 date: 2018-06-22T23:03:44Z
 draft: false
-tags: [gke, storage, pd, persistent disk, migration, pv, persistent volume, kubernetes, gcp]
+tags: [gke, storage, pd, persistent disk, migration, pv, persistent volume, kubernetes, gcp, google, google kubernetes engine]
 ---
 
 == Introduction
