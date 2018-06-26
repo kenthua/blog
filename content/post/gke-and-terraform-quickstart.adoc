@@ -1,0 +1,150 @@
+---
+title: "GKE and Terraform Quickstart"
+date: 2018-06-25T23:04:21Z
+draft: false
+tags: [gke, kubernetes, gcp, terraform, node pool, cluser, provider]
+---
+
+As I am just starting to use Terraform for GKE, I noticed the google provider plugin support for Terraform is https://github.com/terraform-providers/terraform-provider-google/issues/285[constantly improving] for the GKE component.  There are many ways to get started, but there are also some guides to getting started with the examples.  
+
+The first thing to notice there are 2 https://github.com/terraform-providers/terraform-provider-google/issues/475[resources] which are available as it relates to GKE, https://www.terraform.io/docs/providers/google/r/container_cluster.html[google_container_cluster] and https://www.terraform.io/docs/providers/google/r/container_node_pool.html[google_container_node_pool].  This setup allows for us separate the management of the cluster and it's node pools which can be managed by different teams.
+
+While this is my first foray, there are likely some practices I have not yet started to use because I'm unaware of it.  But here goes as a first shot.
+
+In the example linked, one good practice is to not have the `default-pool` created by the cluster when it is https://github.com/terraform-providers/terraform-provider-google/issues/773[first created].  This is noted in the below example provided.
+
+== The Files
+So if we get started we have a few files to get started with when setting up terraform.  You can pretty much call the files whatever you like, you can also put most into a single file.
+
+https://github.com/kenthua/gke/blob/master/terraform/connections.tf[.connections.tf] - provider information
+[source,bash]
+----
+provider "google" {
+  region  = "${var.region}"
+  project = "${var.project}"
+
+  // Provider settings to be provided via ENV variables
+}
+----
+
+https://github.com/kenthua/gke/blob/master/terraform/variables.tf[.variables.tf] - variable definition
+[source,bash]
+----
+variable "region" {
+  default = "us-central1"
+}
+
+variable "region_zone" {
+  default = "us-central1-f"
+}
+
+variable "project" {
+  description = "The ID of the Google Cloud project"
+}
+----
+
+https://github.com/kenthua/gke/blob/master/terraform/terraform.tfvars[.terraform.tfvars] - your variable definitions
+[source,bash]
+----
+project = "<your_project_name>"
+cluster_name = "tf-cluster"
+region = "us-west1"
+----
+
+https://github.com/kenthua/gke/blob/master/terraform/main.tf[.main.tf] - the main file
+[source,bash]
+----
+data "google_compute_zones" "available" {} # get some zone information
+
+resource "google_container_cluster" "cluster0" {
+  name                     = "${var.cluster_name}"
+  region                   = "${var.region}"
+  network                  = "default"
+  remove_default_node_pool = true
+
+...
+
+  node_pool {
+    name = "default-pool"
+  }
+  lifecycle {
+    ignore_changes = ["node_pool", "node_version", "network"] # node_version listed in case there are discrepencies
+  }
+}
+
+resource "google_container_node_pool" "nodepool0" {
+  cluster = "${google_container_cluster.cluster0.name}"
+  region  = "${var.region}"
+  name    = "dev-pool"
+
+  node_count = 2
+
+...
+
+  }
+}
+----
+
+https://github.com/kenthua/gke/blob/master/terraform/output.tf[.output.tf] - the output, which can be used to query for data post apply
+[source,bash]
+----
+
+...
+
+output "node_version" {
+  value = "${google_container_cluster.cluster0.node_version}"
+}
+----
+
+== How to run
+
+=== Initialize
+This initializes and downloads the dependent plugins for the configuration you have specified
+[source,bash]
+----
+terraform init
+----
+
+=== Plan
+The execution plan, this gives you an idea of what will be applied by terraform.  If there was a previous state stored in `terraform.tfstate` then it will check this against what you are trying to execute.  You can use `-out` to specify a plan file which can be applied.  Terraform documentation says the plan file can be useful for automation.
+[source,bash]
+----
+terraform plan
+----
+
+=== Apply
+Applies the changes to reach the desired state.  You can apply your `plan` file or just based on the files in the specified path.
+[source,bash]
+----
+terraform apply
+----
+
+==== Note
+
+The following below can be used with `plan` or `apply`.
+
+- If you used a config variable file that is not default `terraform.tfvars`, you can specify `-var-file=<your_file>`
+
+- You can also use `-var 'region=us-west1'` to specify specific variables.
+
+Certain changes such as modifying kubernetes labels, gcp tags, and others can lead to resources being destroyed and re-created.  You will be notified whether running `plan` or `apply`  based on the desired changes requested.
+
+- `Plan: 0 to add, 1 to change, 0 to destroy.`
+- `Plan: 1 to add, 0 to change, 1 to destroy.`
+
+The `lifecycle` `ignore_changes` can be useful so that it doesn't cause the cluster to be destroyed if some node pool changes are applied.
+
+- The `node_pool` variable is added to help when making modifications such as  adding/removing node pools, `node_count`, etc. https://github.com/terraform-providers/terraform-provider-google/issues/408[Node pool changes] can be made without the cluster being destroyed when this variable is added.
+
+- The `node_version` variable is added to the `lifecycle` `ignore_changes` because it can cause https://github.com/terraform-providers/terraform-provider-google/issues/1339[unnecessary node pool changes] when there are newer versions available.
+
+- The `network` one is added because it keeps wanting to make network changes.
+
+
+=== Destroy
+When you to destroy what terraform created based on the configuration.
+[source,bash]
+----
+terraform destroy
+----
+

@@ -2,7 +2,7 @@
 title: "Traffic into your kubernetes cluster"
 date: 2018-06-19T23:42:03Z
 draft: false
-tags: [traffic, kubernetes, gke, ingress, istio, path, ssl, secrets, mirroring]
+tags: [traffic, kubernetes, gke, ingress, istio, path, ssl, secrets, mirroring, gcp]
 ---
 
 There are many ways to handle ingress or traffic into your cluster.  GKE provides a cloud resources to help manage your traffic into your cluster.  Below are a few specified, but there are other methods as well.  What about SSL, passthrough / end to end.
