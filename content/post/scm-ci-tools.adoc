@@ -1,0 +1,58 @@
+---
+title: "Source Control Management and CI Tools"
+date: 2018-06-27T23:29:01Z
+draft: true
+tags: [scm, source, ci, continuous integration, build, deploy, gcp, container, container builder, gcb, hugo, automation, continuous, test]
+---
+
+When there are source files, Continuous Integration tools of some form need to be considered.  In the name of automation, everytime commits are pushed, something should be verifying the content or building right?  
+
+Even in the case of this blog which is using hugo to generate static versions of my posts which are written in asciidoc.  Whether it's another post or I'm making changes related to hugo itself, it runs through a CI tool.
+
+The blog source files are hosted on github so one option is to leverage the travis CI integration via GitHub Apps, through your Personal Settings.  It was originally through your individual repository as an integration service, but that has been https://developer.github.com/changes/2018-04-25-github-services-deprecation/[deprecated] in favor of GitHub Apps.  
+
+The first step was to quickly look through the documentation and see what is needed in a `.travis.yml` file to get this going.  By default travis CI will use a container on a cloud provider for the https://docs.travis-ci.com/user/reference/overview/#Virtualisation-Environment-vs-Operating-System[build environment].  Though I didn't use leverage it, there is also a https://docs.travis-ci.com/user/deployment/firebase/[provider] for firebase which is where the blog itself is hosted.  Each CI tool will have it's own domain specific language (DSL), here is an example for this blog with https://github.com/kenthua/blog/blob/master/.travis.yml[travis].  
+
+While I had it going for a little bit, I chose to venture into https://cloud.google.com/container-builder/docs/[Google Cloud Container Builder] (GCB), which essentially uses a container image of some form for each build step.  As part of the process, I built my own hugo container to generate the static content and a https://cloud.google.com/container-builder/docs/configuring-builds/build-test-deploy-artifacts#examples_of_build_config_files[firebase container] to deploy the actual site.  As noted in the firebase provider for travis, it would need to be done for container builder as well, which is to encrypt my https://firebase.google.com/docs/cli/#command_reference[Firebase token].
+
+Generate the firebase token
+
+[source,bash]
+----
+firebase login:ci
+
+# capture the token to be encrypted by Cloud KMS
+----
+
+Create your https://cloud.google.com/kms/docs/encrypt-decrypt#encrypt[Cloud KMS] Keyring and Key
+
+[source, bash]
+----
+KMS_KEYRING=<your_key_ring>
+KMS_KEY=<your_key>
+
+gcloud kms keyrings create $KMS_KEYRING \
+    --location=global 
+
+gcloud kms keys create $KMS_KEY \
+    --keyring=$KMS_KEYRING \
+    --purpose encryption \
+    --location=global
+
+gcloud kms keys add-iam-policy-binding $KMS_KEY \
+    --location=global \
+    --keyring=$KMS_KEYRING \
+    --member=serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com \
+    --role=roles/cloudkms.cryptoKeyEncrypterDecrypter
+
+export TOKEN=<your_firebase_token>
+
+echo -n $TOKEN |  gcloud kms encrypt --plaintext-file=- --ciphertext-file=- --location=global --keyring=$KMS_KEYRING --key=$KMS_KEY | base64
+
+# add this to your cloudbuild.yaml
+----
+
+
+Once you have this set up see my example https://github.com/kenthua/blog/blob/master/cloudbuild.yaml[cloudbuild.yaml] for how to decrypt the key and execute each container as a https://cloud.google.com/container-builder/docs/configuring-builds/build-test-deploy-artifacts[build step].  In order for the interation to occur, within container builder you need to create a https://cloud.google.com/container-builder/docs/running-builds/automate-builds[build trigger], which as part of the process mirrors your github repo.  As part of setting up the trigger, select `cloudbuild.yaml`, which will look for it in your repo.
+
+The way the integrations are setup for either travis or GCB, if the hugo static generation fails, the CI pipeline will fail and it won't deploy the failed commit.
