@@ -5,7 +5,7 @@ draft: false
 tags: [scm, source, ci, continuous integration, build, deploy, gcp, container, container builder, gcb, hugo, automation, continuous, test]
 ---
 
-When there are source files, Continuous Integration tools of some form need to be considered.  In the name of automation, everytime commits are pushed, something should be verifying the content or building right?  
+When there are source files, Continuous Integration tools of some form need to be considered.  In the name of automation, everytime commits are pushed, something should be verifying the content right?  
 
 Even in the case of this blog which is using hugo to generate static versions of my posts which are written in asciidoc.  Whether it's another post or I'm making changes related to hugo itself, it runs through a CI tool.
 
