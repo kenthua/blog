@@ -1,0 +1,113 @@
+---
+title: "Kubernetes: Local Storage and Volume Mounts"
+date: 2018-09-11T23:29:01Z
+draft: false
+tags: [k8s, kubernetes, local, volume, mount, containers, local storage, volumeMount, subpath, configmap]
+---
+
+I've been in the process of migrating from a docker based infrastructure to a kubernetes based infrastructure.  The infrastructure was setup with kubeadm on ubuntu and fedora.  Though that will be for another blog post.
+
+This blog post will focus on a beta storage volume feature on 1.10, "https://kubernetes.io/docs/concepts/storage/volumes/#local[Local]"  This is a more feature rich variation of hostPath, as local supports a disk, partiion or directory.  It can also be used to schedule pods and force them to specific nodes to where the local volume is available.  This means in your deployments / pods, you don't need a nodeSelector when specifying a particular claim.
+
+The first step is to define the "https://kubernetes.io/docs/concepts/storage/storage-classes/#local[local-storage]" storage class.  
+
+[source,yaml]
+----
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: local-storage
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+----
+
+Once you have the local storage class defined, you can now create your pv and pvc resources.
+
+[source,yaml]
+----
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    app: mqttbridge
+  name: mqttbridge-pv
+spec:
+  capacity:
+    storage: 1Gi
+  # volumeMode field requires BlockVolume Alpha feature gate to be enabled.
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  local:
+    path: /opt/mqttbridge
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - myhost
+----
+
+Then the claim itself, as dynamic provisioning is not yet available.  Notice I have a `volumeName` reference so that the claim will reference a specific defined volume.
+
+[source,yaml]
+----
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  labels:
+    app: mqttbridge
+  name: mqttbridge-pvc
+spec:
+  volumeName: mqttbridge-pv
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: local-storage
+----
+
+Now for the deployment itself.
+
+[source,yaml]
+----
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: mqttbridge
+  name: mqttbridge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mqttbridge
+  template:
+    metadata:
+      labels:
+        app: mqttbridge
+    spec:
+      containers:
+      - image: stjohnjohnson/smartthings-mqtt-bridge
+        name: mqttbridge
+        volumeMounts:
+        - name: storage-volume
+          mountPath: /config
+        - name: config-volume
+          mountPath: /config/config.yml
+          subPath: config.yml
+      volumes:
+        - name: storage-volume
+          persistentVolumeClaim:
+            claimName: mqttbridge-pvc
+        - name: config-volume
+          configMap:
+            name: mqttbridge-config
+----
+
+A few things to note in this deployment, that is not just using a local persistent volume, but I'm also mounting a folder and a `configmap` into the same folder.  This is using a https://kubernetes.io/docs/concepts/storage/volumes/#using-subpath[subPath] declaration.  This allows to me specify a folder where other config files may reside or the container may use for files.  Rather than just put a `config.yml` in the mounted folder, I can specify that the file be from a configmap for more flexibility.  Kubernetes volume mounts won't allow for mountPaths to be the same within a single pod, so subPaths allow for some flexibility in this area.  It can also be used as described here to mount configmaps and secrets.
