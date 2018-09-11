@@ -1,6 +1,6 @@
 ---
 title: "Kubernetes: Local Storage and Volume Mounts"
-date: 2018-09-11T23:29:01Z
+date: 2018-09-11T17:00:00Z
 draft: false
 tags: [k8s, kubernetes, local, volume, mount, containers, local storage, volumeMount, subpath, configmap]
 ---
