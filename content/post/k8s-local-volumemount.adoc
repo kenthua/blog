@@ -110,4 +110,6 @@ spec:
             name: mqttbridge-config
 ----
 
-A few things to note in this deployment, that is not just using a local persistent volume, but I'm also mounting a folder and a `configmap` into the same folder.  This is using a https://kubernetes.io/docs/concepts/storage/volumes/#using-subpath[subPath] declaration.  This allows to me specify a folder where other config files may reside or the container may use for files.  Rather than just put a `config.yml` in the mounted folder, I can specify that the file be from a configmap for more flexibility.  Kubernetes volume mounts won't allow for mountPaths to be the same within a single pod, so subPaths allow for some flexibility in this area.  It can also be used as described here to mount configmaps and secrets.
+A few things to note in this deployment, I am not just using a local persistent volume, but I'm also mounting a folder and a `configmap` into the same folder.  This is using a https://kubernetes.io/docs/concepts/storage/volumes/#using-subpath[subPath] declaration.  This allows to me specify a folder where other config files may reside or the container may use for files.  Rather than just put a `config.yml` in the mounted folder, I can specify that the file be from a configmap for more flexibility.  
+
+Kubernetes volume mounts won't allow for mountPaths to be the same within a single pod, so subPaths allow for some flexibility in this area.  It can also be used as described here to mount configmaps and secrets.
