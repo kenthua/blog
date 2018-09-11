@@ -7,9 +7,9 @@ tags: [k8s, kubernetes, local, volume, mount, containers, local storage, volumeM
 
 I've been in the process of migrating from a docker based infrastructure to a kubernetes based infrastructure.  The infrastructure was setup with kubeadm on ubuntu and fedora.  Though that will be for another blog post.
 
-This blog post will focus on a beta storage volume feature on 1.10, "https://kubernetes.io/docs/concepts/storage/volumes/#local[Local]"  This is a more feature rich variation of hostPath, as local supports a disk, partiion or directory.  It can also be used to schedule pods and force them to specific nodes to where the local volume is available.  This means in your deployments / pods, you don't need a nodeSelector when specifying a particular claim.
+This blog post will focus on a beta storage volume feature on 1.10, https://kubernetes.io/docs/concepts/storage/volumes/#local[Local].  This is a more feature rich variation of hostPath, as local supports a disk, partiion or directory.  It can also be used to schedule pods and force them to specific nodes to where the local volume is available.  This means in your deployments / pods, you don't need a nodeSelector when specifying a particular claim.
 
-The first step is to define the "https://kubernetes.io/docs/concepts/storage/storage-classes/#local[local-storage]" storage class.  
+The first step is to define the https://kubernetes.io/docs/concepts/storage/storage-classes/#local[local-storage] storage class.  
 
 [source,yaml]
 ----
