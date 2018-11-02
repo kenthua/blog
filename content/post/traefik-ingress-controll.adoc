@@ -2,7 +2,7 @@
 title: "Traefik - Ingress Controller"
 date: 2018-11-01T17:00:00Z
 draft: false
-tags: [k8s, kubernetes, ingress, controller, proxy, routing, gke, google, gcp]
+tags: [k8s, kubernetes, ingress, controller, proxy, routing, traefik, gke, google, gcp]
 ---
 
 Kubernetes has an https://kubernetes.io/docs/concepts/services-networking/ingress/[ingress controller] to help you manage your layer 7 HTTP traffic.  It has concepts around hostnames, TLS and maps back to your services within k8s.  On Google Kubernetes Engine (GKE) when an ingress is specified, it will spin up an external HTTP Google Cloud Load Balancer.  What about a GKE private cluster?  It doesn't hae access to an external L7 HTTP or L4 TCP Network Load Balancer.  In this case, for the time being you may want to opt for an ingress controller such as nginx, haproxy, or https://traefik.io/[traefik] in this post.  
