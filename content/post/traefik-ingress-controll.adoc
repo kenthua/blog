@@ -1,0 +1,50 @@
+---
+title: "Traefik - Ingress Controller"
+date: 2018-11-01T17:00:00Z
+draft: false
+tags: [k8s, kubernetes, ingress, controller, proxy, routing, gke, google, gcp]
+---
+
+Kubernetes has an https://kubernetes.io/docs/concepts/services-networking/ingress/[ingress controller] to help you manage your layer 7 HTTP traffic.  It has concepts around hostnames, TLS and maps back to your services within k8s.  On Google Kubernetes Engine (GKE) when an ingress is specified, it will spin up an external HTTP Google Cloud Load Balancer.  What about a GKE private cluster?  It doesn't hae access to an external L7 HTTP or L4 TCP Network Load Balancer.  In this case, for the time being you may want to opt for an ingress controller such as nginx, haproxy, or https://traefik.io/[traefik] in this post.  
+
+Traefik can function as an ingress controller, but it can also be a standalone proxy, docker proxy, etc.  It supports quite a few providers.  Normally you configure it with a `traefik.toml` configuration file, but there are other methods depending on your provider.  While you can use a `traefik.toml` within k8s, ideally you'll want to leverage https://docs.traefik.io/configuration/backends/kubernetes/#annotations[annoations] to manage your entrypoints.  These are defined in your ingress and service definitions.  
+
+By default traefik will open up 80 for http traffic and 8080 for it's dashboard, metrics and api.  So what if you wanted TLS or define other configurations such as logging.  Without the config file, you need to define them as https://github.com/kenthua/gke/blob/master/gclb/traefik/traefik-deployment.yaml#L38-L45[arguments] in your deployment or daemonset manifests.
+
+Once you have TLS configured, each TLS secret in kubernetes is loaded in the namespace where you define your ingress.  Traefik has a default TLS certificate that it falls back to if your certificate doesn't match the host that is being defined.
+
+[source,yaml]
+----
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  labels:
+    app: httpbin    
+  name: httpbin-ingress
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/frontend-entry-points: https
+spec:
+  tls:
+  - secretName: httpbin-tls
+  rules: 
+  - host: httpbin.services.fluffycloud.online 
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: httpbin
+          servicePort: http
+----
+
+In the example above, the host is `httpbin.services.fluffycloud.online`, if my service isn't listing on this fully qualified domain name and I try to access my ingress, it will return the traefik default certificate.
+
+You can add your tls by hand or by using `kubectl`
+[source,bash]
+----
+kubectl create secret tls httpbin-tls --key=tls.key --cert=tls.crt
+----
+
+NOTE: Ensure that you are using `tls.key` and `tls.crt` as the ingress is specifically looking for those entries.
+
+This post is based on this https://github.com/kenthua/gke/tree/master/gclb/traefik[example].
