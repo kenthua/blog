@@ -1,0 +1,24 @@
+---
+title: "GCP GKE IAM - k8s namespace RBAC"
+date: 2018-11-05T17:00:00Z
+draft: false
+tags: [k8s, kubernetes, gcp, iam, rbac, gke, google, gcp, namespace]
+---
+
+How many acronyms or abbreviations can I fit into one title.  As an organization leverages kubernetes more and more, a shared environment may become more prevalent, rather than many clusters.  There are advantages to a shared environment, less clusters to manage when it may not be necessary.  The first step into a shared environment is namespace isolation between services, teams, environments, etc.  
+
+GKE provides you with the necessary resources to create such isolation, but you need to properly define roles and k8s rbac roles.  While GCP provides https://cloud.google.com/kubernetes-engine/docs/how-to/iam#predefined[predefined GKE roles] for users/groups such as GKE Admin, GKE Developer, etc, these are cluster wide roles.  Meaning an user/group who has this role would have access to all the specified resources/actions across all namespaces within a cluster.  So while it makes sense for some user/groups to have this role, to isolate namespaces, we would venture into a https://cloud.google.com/kubernetes-engine/docs/how-to/iam#custom_roles[custom role] with a specific permission, `container.clusters.get`. 
+
+Why do we need this? Today, a developer user or an automation tool via GCP service account, may need access to properly `get-credentials` via the gcloud command.  However that is all they can do, once they can get access to the cluster, k8s RBAC can take over binding specific `Role` and `ClusterRole`.
+
+Also today, GKE only passes down the user account / email down to the k8s instance.  For a binding (`RoleBinding` or `ClusterRoleBinding`) subject, only `kind: User` is available.  So while you can assign GCP IAM roles permissions to groups, only the individual user account is passed down.  We wouldn't be able to take advantage of `kind: Group`.
+
+The kubernetes documentation provides a good initial overview to https://kubernetes.io/docs/reference/access-authn-authz/rbac/[RBAC]. Some things to keep noted, for `Role` and `ClusterRole` rules:
+
+* `apiGroups: [""]` references the core `v1` api, if you want to provide permission to other `apiGroups` you'll have to specify them.  You can find them for your cluster with `kubectl api-versions`.  Such as wanting to leverage, `apps`, `extensions`, `batch`, etc.
+* `resources: ["deployments"]` references the kubernetes resources
+* `verbs: ["get", "create"]` references the verb actions the role can perform.
+
+`Role` and `RoleBinding` are bound to a namespace, while `ClusterRole` and `ClusterRoleBinding` are bound to the cluster.  For instance, you can also have a `RoleBinding` at the namespace level of a `ClusterRole`.  
+
+This post is based on this https://github.com/kenthua/gke/tree/master/rbac[example].
