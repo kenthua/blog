@@ -37,6 +37,8 @@ params:
   gcse: '018150144781013646340:qabfu9bsm5k'
   description: 'Discussion about technology and things that interest me'
   keywords: 'cloud,open source,home automation,technology,gcp,gke,kubernetes,java,google,tech'
+  commit: 'https://github.com/kenthua/blog/tree/'
+
 menu:
   main:
     - name: Home
