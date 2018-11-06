@@ -1,6 +1,6 @@
 FROM python:alpine
   
-ENV HUGO_VERSION 0.42.1
+ENV HUGO_VERSION 0.50
 ENV HUGO_BINARY hugo_${HUGO_VERSION}_linux-64bit
 
 # Install pygments (for syntax highlighting) and bash
