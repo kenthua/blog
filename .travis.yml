@@ -12,7 +12,7 @@ before_install:
     - sudo npm install -g firebase-tools
 
 install:
-    - wget https://github.com/gohugoio/hugo/releases/download/v0.42.1/hugo_0.42.1_Linux-64bit.deb
+    - wget https://github.com/gohugoio/hugo/releases/download/v0.50.0/hugo_0.50.0_Linux-64bit.deb
     - sudo dpkg -i hugo*.deb
     - pip install Pygments
 
