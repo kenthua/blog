@@ -32,8 +32,8 @@ jobs:
           submodules: recursive
       - name: Install asciidoctor
         run: "sudo apt-get install asciidoctor"
-      # - name: Install firebase tools
-      #   run: "sudo npm install -g firebase-tools"
+      - name: Install firebase tools
+        run: "sudo npm install -g firebase-tools"
       - name: Install Node.js dependencies
         run: "[[ -f package-lock.json || -f npm-shrinkwrap.json ]] && npm ci || true"
       - name: Build with Hugo
@@ -45,20 +45,26 @@ jobs:
           hugo \
             --minify \
             --baseURL "${{ steps.pages.outputs.base_url }}/"
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
-        with:
-          path: ./public
-
-  # Deployment job
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
+      # - name: Upload artifact
+      #   uses: actions/upload-pages-artifact@v2
+      #   with:
+      #     path: ./public
       - name: Deploy to Firebase
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         run: |
           ls -la \
-          && sudo npm install -g firebase-tools \
-          && firebase deploy --token $FIREBASE_TOKEN
+          && firebase deploy --token $FIREBASE_TOKEN      
+
+  # # Deployment job
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   needs: build
+  #   steps:
+  #     - name: Deploy to Firebase
+  #       env:
+  #         FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+  #       run: |
+  #         ls -la \
+  #         && sudo npm install -g firebase-tools \
+  #         && firebase deploy --token $FIREBASE_TOKEN
