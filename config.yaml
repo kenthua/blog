@@ -16,7 +16,13 @@ googleAnalytics: UA-80183602-1
 
 security:
   exec:
-    allow: "['^dart-sass-embedded$', '^go$', '^npx$', '^postcss$', '^asciidoctor$', '^pandoc$']"
+    allow:
+    - "^dart-sass-embedded$"
+    - "^go$"
+    - "^npx$"
+    - "^postcss$"
+    - "^asciidoctor$"
+    - "^pandoc$"
 
 permalinks:
   post: '/:year/:month/:day/:filename/'
