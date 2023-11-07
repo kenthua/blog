@@ -14,9 +14,9 @@ enableRobotsTXT: true
 disqusShortname: techramblings
 googleAnalytics: UA-80183602-1
 
-[security]
-  [security.exec]
-    allow = ['^dart-sass-embedded$', '^go$', '^npx$', '^postcss$', '^asciidoctor$', '^pandoc$']
+security:
+  exec:
+    allow: "['^dart-sass-embedded$', '^go$', '^npx$', '^postcss$', '^asciidoctor$', '^pandoc$']"
 
 permalinks:
   post: '/:year/:month/:day/:filename/'
