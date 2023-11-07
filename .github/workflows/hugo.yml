@@ -56,6 +56,8 @@ jobs:
     needs: build
     steps:
       - name: Deploy to Firebase
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         run: |
           sudo npm install -g firebase-tools \
           && firebase deploy --token $FIREBASE_TOKEN
