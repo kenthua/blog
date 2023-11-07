@@ -47,8 +47,10 @@ params:
   description: 'Discussion about technology and things that interest me'
   keywords: 'cloud,open source,home automation,technology,gcp,gke,kubernetes,java,google,tech'
   commit: 'https://github.com/kenthua/blog/tree/'
-  gtm_id: "UA-80183602-1"
-  gtm_ga: true
+
+services:
+  googleAnalytics:
+    googleAnalytics: "UA-80183602-1"
 
 menu:
   main:
