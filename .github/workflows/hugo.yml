@@ -18,7 +18,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      HUGO_VERSION: 0.114.0
+      HUGO_VERSION: 0.120.3
     steps:
       - name: Install Hugo CLI
         run: |
@@ -53,8 +53,7 @@ jobs:
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         run: |
-          ls -la \
-          && firebase deploy --token $FIREBASE_TOKEN      
+          firebase deploy --token $FIREBASE_TOKEN      
 
   # # Deployment job
   # deploy:
