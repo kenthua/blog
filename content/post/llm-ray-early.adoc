@@ -1,0 +1,147 @@
+---
+title: "Early adventures with Ray on Kubernetes (kuberay) and LLM"
+date: 2023-11-11T17:00:00Z
+draft: false
+tags: [k8s, kubernetes, ray, llm, llama2, gke, kuberay, rayservice, raycluster, gpu, accelerators]
+---
+
+https://www.ray.io/[Ray] is a distributed framework for scaling applications. However, my journey started with https://github.com/ray-project/kuberay[Kuberay] which is an operator and various CRDs such as `RayCluster` and `RayService` to provide a more declarative k8s native experience for Ray. Much of what is described in this article is in the contex to serving an LLM.
+
+While we will eventually get to more examples we will initially start with some things to note. I may be interpreting some things wrong as I'm getting started as well, but constructs below you should be aware of.
+
+== Getting started with accelerators
+
+Like `selectors` in k8s, kuberay uses some of these concepts to help schedule your workload onto the worker pool. Which means if things don't match, things will not get scheduled and started. Here are a few things that need to line up or you at least need to specify enough resources. By default kuberay doesn't know how much actual resources you have. Just like the k8s node has an allocatable set of resources for your pods, you need to set that in your definiton of your Ray Cluster.
+
+This starts with your definition in a Ray Cluster, the `rayStartParams` for each worker will specify which can be made available in the cluster. The resources can be used to define fine-grained resource types, for instance in this case accelerator type. Like k8s labels and selectors, these are abritrary and they just need to match.
+
+[source,yaml]
+---
+    workerGroupSpecs:
+      ...
+      groupName: gpu-group
+      rayStartParams:
+        resources: '"{\"accelerator_type_cpu\": 22, \"accelerator_type_l4\": 2}"'
+---
+
+To maximize resources you may want to align `spec.template.container.resources`.
+[source,yaml]
+---
+            resources:
+              limits:
+                cpu: "22"
+                memory: "80G"
+                nvidia.com/gpu: 2
+              requests:
+                cpu: "22"
+                memory: "80G"
+                nvidia.com/gpu: 2
+---
+
+You will notice while we specify a whole number in `accelerator_type_l4`, when we define it in the model, we specify an amount `accelerator_type_l4: 0.01` just to get it scheduled on the appropriate worker.
+[source,yaml]
+---
+scaling_config:
+  num_workers: 2
+  num_gpus_per_worker: 1
+  num_cpus_per_worker: 8
+  placement_strategy: "STRICT_PACK"
+  resources_per_worker:
+    accelerator_type_l4: 0.01
+---
+
+The actual GPU consumption is through `num_workers`. The `num_gpus_per_worker` is misleading because it's just 0 or 1 from a `rayllm` perspective. 0 meaning single GPU and 1 meaning multi-gpu.
+
+== RayCluser or RayService
+
+RayCluster can work standalone where you can in interactive mode deploy and test models. RayService is like a controller a RayCluster. If you look at the RayService spec we see:
+[source,yaml]
+---
+apiVersion: ray.io/v1alpha1
+kind: RayService
+metadata:
+  name: rayllm
+spec:
+...
+  rayClusterConfig:
+    headGroupSpec:
+    ...
+    workerGroupSpecs:
+...
+---
+
+A good tip in my testing is to spin up a RayCluster to test and iterate on your model / code testing. You can do this by `kubectl exec -it head pod` and running `serve run ${YOUR_MODEL_OR_MODEL_CONFIG}` to deploy the model. Then when you are ready, wrap it in RayService and you can deploy it as part of your automated pipeline and it will be managed.
+
+At the moment, RayCluster is HA's as the headgroup is essentially the controller / API server for workers. If we lose our headgroup, our service may be rendered unavailable. RayService an manage the availablity of our RayCluster.
+
+== Loading models
+
+As noted above within a RayCluster you can load your model using `serve run`. Great for testing, but not exactly something we'd want to automate with.
+
+The `spec.serveConfigV2` is a representation of your loading config.yaml from a Ray (non-kuberay) perspective. Notice the difference in the `import_path`. 
+
+Loading a model using rayllm.backend library:
+[source,yaml]
+---
+  serveConfigV2: |
+    applications:
+    - name: ray-llm
+      route_prefix: /
+      import_path: rayllm.backend:router_application
+      runtime_env:
+        working_dir: "https://github.com/kenthua/ai-ml/archive/refs/tags/v0.0.5.zip"
+      args:
+        models:
+        - "./models/meta-llama--Llama-2-7b-chat-hf.yaml"
+---
+
+We use `serve run config.yaml` with RayCluster.
+
+Loading a model with custom python using Ray libraries
+[source,yaml]
+---
+  serveConfigV2: |
+    applications:
+    - name: llama-2
+      route_prefix: /
+      import_path: model_nf4_mg:chat_app_nf4_mg
+      runtime_env:
+        working_dir: "https://github.com/kenthua/ai-ml/archive/refs/tags/v0.0.5.zip"
+        env_vars:
+          MODEL_ID: "meta-llama/Llama-2-70b-chat-hf"
+      deployments:
+      - name: Chat
+        num_replicas: 1
+---
+
+We use `serve run model_nf4_mg:chat_app_nf4_mg` which maps to our python file and our binding name in the python code.
+
+The `runtime_env.working_dir` on takes local path or a zip archive which is why I made a release of my https://github.com/kenthua/ai-ml[repo] to get a zip to use for loading.
+
+For the time being I'm using the pre-built `anyscale/ray-llm` container image for the head and worker groups. Since I have specific models I want to load I can use the `working_dir` as a way to specify what to load without manipulating the image. Alternatively for a custom pipeline, you may want to incorporate adding the appropriate files into a custom image as part of your pipeline.
+
+== Checking status
+
+Ray has a great UI to look at the status, resource details, jobs and workers of your cluster. You can access this UI by forwarding the UI port:
+[source,bash]
+---
+kubectl port-forward pod/your_head_pod 8265:8265
+---
+
+You can also get some details via CLI by running some available commands
+[source,bash]
+---
+kubectl exec -it your_head_pod -- bash
+---
+
+and then runnining in the container, there are more commands you can use to get more details
+[source,bash]
+---
+ray status
+
+serve status
+
+ray list nodes
+---
+
+More to come.
