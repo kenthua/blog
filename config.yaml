@@ -50,7 +50,7 @@ params:
 
 services:
   googleAnalytics:
-    googleAnalytics: "G-81MV8Q5ZPL"
+    ID: "G-81MV8Q5ZPL"
 
 menu:
   main:
