@@ -12,7 +12,6 @@ pygmentsCodefencesGuessSyntax: true
 enableRobotsTXT: true
 #enableGitInfo: true
 disqusShortname: techramblings
-googleAnalytics: UA-80183602-1
 
 security:
   exec:
@@ -29,7 +28,6 @@ permalinks:
   code: '/:filename/'
 
 author:
-  name: Kent Hua
   github: kenthua
   gitlab: kenthua
   linkedin: kenthua
@@ -37,6 +35,8 @@ author:
 params:
   homeTitle: thoughts
   subtitle: 'cloud, open source, home automation, technology'
+  AuthorName: "Kent Hua"
+  GitHubUser: "kenthua"
   rss: true
   comments: true
   dateFormat: '2006-01-02'
