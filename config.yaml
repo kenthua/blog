@@ -45,12 +45,12 @@ params:
   useHLJS: true
   gcse: '018150144781013646340:qabfu9bsm5k'
   description: 'Discussion about technology and things that interest me'
-  keywords: 'cloud,open source,home automation,technology,gcp,gke,kubernetes,java,google,tech'
+  keywords: 'cloud,open source,home automation,technology,gcp,gke,kubernetes,java,google,tech,k8s,llm,aiml,ai,ml'
   commit: 'https://github.com/kenthua/blog/tree/'
 
 services:
   googleAnalytics:
-    googleAnalytics: "UA-80183602-1"
+    googleAnalytics: "G-81MV8Q5ZPL"
 
 menu:
   main:
