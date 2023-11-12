@@ -16,17 +16,17 @@ Like `selectors` in k8s, kuberay uses some of these concepts to help schedule yo
 This starts with your definition in a Ray Cluster, the `rayStartParams` for each worker will specify which can be made available in the cluster. The resources can be used to define fine-grained resource types, for instance in this case accelerator type. Like k8s labels and selectors, these are abritrary and they just need to match.
 
 [source,yaml]
----
+----
     workerGroupSpecs:
       ...
       groupName: gpu-group
       rayStartParams:
         resources: '"{\"accelerator_type_cpu\": 22, \"accelerator_type_l4\": 2}"'
----
+----
 
 To maximize resources you may want to align `spec.template.container.resources`.
 [source,yaml]
----
+----
             resources:
               limits:
                 cpu: "22"
@@ -36,11 +36,11 @@ To maximize resources you may want to align `spec.template.container.resources`.
                 cpu: "22"
                 memory: "80G"
                 nvidia.com/gpu: 2
----
+----
 
 You will notice while we specify a whole number in `accelerator_type_l4`, when we define it in the model, we specify an amount `accelerator_type_l4: 0.01` just to get it scheduled on the appropriate worker.
 [source,yaml]
----
+----
 scaling_config:
   num_workers: 2
   num_gpus_per_worker: 1
@@ -48,7 +48,7 @@ scaling_config:
   placement_strategy: "STRICT_PACK"
   resources_per_worker:
     accelerator_type_l4: 0.01
----
+----
 
 The actual GPU consumption is through `num_workers`. The `num_gpus_per_worker` is misleading because it's just 0 or 1 from a `rayllm` perspective. 0 meaning single GPU and 1 meaning multi-gpu.
 
@@ -56,7 +56,7 @@ The actual GPU consumption is through `num_workers`. The `num_gpus_per_worker` i
 
 RayCluster can work standalone where you can in interactive mode deploy and test models. RayService is like a controller a RayCluster. If you look at the RayService spec we see:
 [source,yaml]
----
+----
 apiVersion: ray.io/v1alpha1
 kind: RayService
 metadata:
@@ -68,7 +68,7 @@ spec:
     ...
     workerGroupSpecs:
 ...
----
+----
 
 A good tip in my testing is to spin up a RayCluster to test and iterate on your model / code testing. You can do this by `kubectl exec -it head pod` and running `serve run ${YOUR_MODEL_OR_MODEL_CONFIG}` to deploy the model. Then when you are ready, wrap it in RayService and you can deploy it as part of your automated pipeline and it will be managed.
 
@@ -82,7 +82,7 @@ The `spec.serveConfigV2` is a representation of your loading config.yaml from a 
 
 Loading a model using rayllm.backend library:
 [source,yaml]
----
+----
   serveConfigV2: |
     applications:
     - name: ray-llm
@@ -93,13 +93,13 @@ Loading a model using rayllm.backend library:
       args:
         models:
         - "./models/meta-llama--Llama-2-7b-chat-hf.yaml"
----
+----
 
 We use `serve run config.yaml` with RayCluster.
 
 Loading a model with custom python using Ray libraries
 [source,yaml]
----
+----
   serveConfigV2: |
     applications:
     - name: llama-2
@@ -112,7 +112,7 @@ Loading a model with custom python using Ray libraries
       deployments:
       - name: Chat
         num_replicas: 1
----
+----
 
 We use `serve run model_nf4_mg:chat_app_nf4_mg` which maps to our python file and our binding name in the python code.
 
@@ -124,24 +124,24 @@ For the time being I'm using the pre-built `anyscale/ray-llm` container image fo
 
 Ray has a great UI to look at the status, resource details, jobs and workers of your cluster. You can access this UI by forwarding the UI port:
 [source,bash]
----
+----
 kubectl port-forward pod/your_head_pod 8265:8265
----
+----
 
 You can also get some details via CLI by running some available commands
 [source,bash]
----
+----
 kubectl exec -it your_head_pod -- bash
----
+----
 
 and then runnining in the container, there are more commands you can use to get more details
 [source,bash]
----
+----
 ray status
 
 serve status
 
 ray list nodes
----
+----
 
-More to come.
+More to come. These are just some initial thoughts, so I may be misinterpreting some aspects or there may be more ideal ways of performing the same task.
