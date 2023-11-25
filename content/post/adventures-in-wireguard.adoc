@@ -1,0 +1,224 @@
+---
+title: "Early adventures with Wireguard server on a VPS"
+date: 2023-11-24T17:00:00Z
+draft: false
+tags: [vpn, wireguard, openwrt, cgnat, routing, network, firewall]
+---
+
+The days of complicated, long config files, complex rules for the most part are over. Wireguard being builtin to the kernel makes things much simpler from an app/tool perspective because it's really just a single configuration file. While there is a server element, if you have clients to connect, but you can, like other VPN solutions connect site to site. However, a peer can share it's network through the `AllowedIPs` configuration. This example is of a peer conecting to a VPS host with wireguard server installed. The intent of this setup is from a wireguard server deployed on a VPS, access resources on my home network because I can't connect to it directly via IPv4 (no address assigned), I'm behind a cgnat at home.
+
+The peer in my case is OpenWRT. Alternatives to Wireguard would be services like Tailscale (WireGuard implementation) and Zerotier (custom implementation).
+
+== Setting up on the server
+
+First install the proper packages, on ubuntu 22.04 it's the following
+[source]
+----
+sudo apt-get install wireguard
+----
+
+Each server or peer must generate it's own private and public keys for secure connection, we can do this in one-line. The following files will be generated, `privatekey` and `publickey`
+[source]
+----
+wg genkey | tee privatekey | wg pubkey > publickey
+----
+
+Create your desired configuration, typically located at `/etc/wireguard/wg0.conf` The file name is arbitrary, but will be used for your interface name as well as the systemd service.
+
+You will need your server private key and peer's public key
+[source]
+----
+[Interface]
+Address = 10.0.0.1/32
+ListenPort = 51820
+PrivateKey = <server private key here, i.e. SPriv1>
+PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+
+[Peer]
+PublicKey = <peer private key here, i.e. PPub1>
+AllowedIPs = 10.0.0.10/32,192.168.2.50/29,192.168.2.100/29
+----
+
+Server config `Interface`
+
+* `10.0.0.1/32` will be the address for my server
+* PostUp/PostDown - needed so you can access stuff at home (or peer)
+** `FORWARD` ensures packets are forwarded from the wireguard interface
+** nat `POSTROUTING` forward packets to the outbound interface, usually `eth0`
+
+One of your peers `Peer`
+
+* `PublicKey` - you will get this from the peer instance / keys
+* `AllowedIPs` this is the critical element of the "contract" or what is to be made available by the peer, in this case services at home.
+** `10.0.0.0.10/32` - only the ip of the peer we want to talk to
+** `192.168.2.50/29`
+** `192.168.2.100/29`
+
+Don't forget some essentials, firewall and enabling forwarding.
+[source]
+----
+sudo sysctl -w net.ipv4.ip_forward=1
+----
+
+firewalld, or whichever firewall tool you use, you will need to ope up `51820` or whatever port you choose. `51820` is WireGuard's default port.
+[source]
+----
+sudo firewall-cmd --permanent --zone=public --add-port=51820/udp
+----
+
+Lastly, start it up
+[source]
+----
+sudo systemctl start wg-quick@wg0.service
+----
+
+* `wg-quick` the name of the service that instaling `wireguard` created
+* `wg0.service` the wg0 conf name and service type
+
+The cool part about WireGuard is that it can manipulate routing rules or whatever you want in the PostUp and teardown with PostDown. Remember the `AllowedIPs`? it will also generate the routing rules for those ranges.
+
+When things are working
+[source]
+----
+interface: wg0
+  public key: SPub1...
+  private key: (hidden)
+  listening port: 51820
+
+peer: PPub1...
+  endpoint: <peers ip>:33915
+  allowed ips: 10.0.0.10/32, 192.168.2.50/29, 192.168.2.100/29
+  latest handshake: 9 seconds ago
+  transfer: 602.48 KiB received, 21.51 KiB sent
+----
+
+== Setup the peer
+
+While the peer can be one of your servers behind the cgnat/wide internet or a client device (phone, laptop, desktop), the setup would be the same. 
+If this were a site to site type WireGuard VPN, you would also need to deal with firewalls into your particular server. 
+
+For typical clients, if it can make it out to the internet and reach your server you are good to go. 
+
+For this particular setup, my client is going to be my router with OpenWRT deployed. So there will be some uniqueness to it from a config perspective, since luci will generate the conf file for you.
+
+First you will need some packages, for 23.05 it is only the 3 below
+[source]
+----
+wireguard-tools
+kmod-wireguard
+luci-proto-wireguard
+----
+
+For 22.03 there are 2 additional
+[source]
+----
+wireguard-tools
+kmod-wireguard
+luci-proto-wireguard
+luci-app-wireguard
+luci-i18n-wireguard-en
+----
+
+Once installed, restart your network
+
+* System -> Startup -> network (restart)
+
+Then create your WireGuard interface (wg0)
+
+* Network - Interface -> Add new interface
+
+** Name: `wg0`
+** Protocol: `WireGuard VPN`
+
+Enter some of this peer's information
+
+* Private key: The private key of the peer you need to generate, i.e. PPriv1
+* Public key: The public key of the peer you need to generate, i.e. PPub1
+* IP Addresses: `10.0.0.10/32`
+
+Firewall settings
+
+* Create a vpn zone. We will need to do the traffic fowarding later.
+
+** --custom -- : `vpn`
+
+Peers - Add peer
+
+* Public key: The public key for what you generated on the server, i.e. SPub1
+* Allowed IPs:
+** `10.0.0.1/32` -- the IP of the peer
+* Route Allowed IPs: `enabled`, we want it to generate the routes
+* Endpoint host: the IP of the server
+* Endpoint Port: the Por of the server that WireGuard is listening on and the firewall isopen
+* Persistent Keep Alive: `25`, if you are behind a NAT as noted, i.e. cgnat
+
+NOTE: I noticed when I specified the range my router it in, i.e. 192.168.1.0/24 (it would render my router inaccessible and I had to factory reset)
+
+Save -> Save & Apply
+
+
+Network -> Firewall
+
+* You will notice an entry generated for `vpn`, or whatever you entered in the Firewall settings of the interface
+Click Edit on that row:
+
+** Input/Output/Forward should all be `accept`
+** Allow foward to destination zones: This should be the `lan` or interfaces you want other WireGuard peers/server to access
+
+Save -> Save & Apply
+
+
+Give the `wg0` a restart
+
+Network -> Interface -> `wg0` -> Restart
+
+This should be the final output from `/etc/config/network`
+[source]
+----
+config interface 'wg0'
+        option proto 'wireguard'
+        list addresses '10.0.0.10/32'
+        option private_key 'PPriv1...'
+
+config wireguard_wg0
+        option description 'vps'
+        option route_allowed_ips '1'
+        option endpoint_host 'serverIP'
+        option endpoint_port 'serverPort'
+        option persistent_keepalive '25'
+        option public_key 'SPub1...'
+        list allowed_ips '10.0.0.1/32'
+----
+
+This is the `wg show` output
+[source]
+----
+  public key: PPub1...
+  private key: (hidden)
+  listening port: 33915
+
+peer: SPub1...
+  endpoint: <your wg server IP>:51820
+  allowed ips: 10.0.0.1/32
+  latest handshake: 44 seconds ago
+  transfer: 96.82 KiB received, 791.62 KiB sent
+  persistent keepalive: every 25 seconds
+----
+
+== Troubleshooting
+
+Remember how WireGuard is built into the kernel, we need to enable a flag on the kernel to turn on some logs
+[source]
+----
+echo "module wireguard +p" | sudo tee /sys/kernel/debug/dynamic_debug/control
+sudo dmesg -wT
+----
+
+Turn it off
+[source]
+----
+echo "module wireguard -p" | sudo tee /sys/kernel/debug/dynamic_debug/control
+----
+
+Happy VPNing and access your home network from anywhere securely.
