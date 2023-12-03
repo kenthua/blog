@@ -221,4 +221,18 @@ Turn it off
 echo "module wireguard -p" | sudo tee /sys/kernel/debug/dynamic_debug/control
 ----
 
+Very bad / slow wireguard performance. If you recall, this particulat setup was for handling cgnat's and not being able to port forward. My performance was in the 10-20kbits/sec. I had to set my mtu to `1400`. The default is `1420`
+
+For OpenWRT
+- Network -> Interfaces -> wg0 (edit) -> Advanced Settings -> MTU
+
+This can also be set in the WireGuard configuration
+[source]
+----
+[Interface]
+...
+MTU = 1400
+...
+----
+
 Happy VPNing and access your home network from anywhere securely.
